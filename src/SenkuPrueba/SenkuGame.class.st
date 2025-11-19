@@ -72,6 +72,46 @@ SenkuGame >> initializeBoard [
 
 ]
 
+{ #category : 'game logic' }
+SenkuGame >> moveFrom: r1 at: c1 to: r2 at: c2 [
+    "Mueve una ficha desde (r1,c1) a (r2,c2) comiendo la del medio.
+     Retorna true si el movimiento fue válido y realizado."
+
+    | dFila dCol filaMedio colMedio cInicio cFin cMedio |
+
+    "1. VALIDACIÓN GEOMÉTRICA"
+    dFila := r1 - r2.
+    dCol := c1 - c2.
+
+    "Debe ser recto (solo cambia una coordenada)"
+    ((dFila = 0) or: [ dCol = 0 ]) ifFalse: [ ^ false ].
+
+    "Debe moverse exactamente 2 posiciones"
+    ((dFila abs + dCol abs) = 2) ifFalse: [ ^ false ].
+
+    "2. CALCULAR LA CELDA DEL MEDIO (LA FICHA A COMER)"
+    filaMedio := (r1 + r2) // 2.
+    colMedio := (c1 + c2) // 2.
+
+    "3. OBTENER CELDAS DEL TABLERO"
+    cInicio := (board at: r1) at: c1.
+    cFin := (board at: r2) at: c2.
+    cMedio := (board at: filaMedio) at: colMedio.
+
+    "4. VALIDACIONES DE ESTADO"
+    (cInicio hasPeg) ifFalse: [ ^ false ]. "Debe haber ficha en origen"
+    (cFin isEmpty) ifFalse: [ ^ false ].   "Destino debe estar vacío"
+    (cMedio hasPeg) ifFalse: [ ^ false ].  "Debe haber ficha para comer"
+
+    "5. EJECUCIÓN"
+    cInicio beEmpty.  "Quito ficha origen"
+    cMedio beEmpty.   "Como ficha del medio"
+    cFin bePeg.       "Pongo ficha en destino"
+
+    ^ true
+
+]
+
 { #category : 'set up' }
 SenkuGame >> setupStandardBoard [
     1 to: 7 do: [:row |
